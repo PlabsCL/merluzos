@@ -1,0 +1,368 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="theme-color" content="#0a0a0c">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Merluzos">
+<meta name="mobile-web-app-capable" content="yes">
+<!-- Icono "M" embebido (no requiere archivos externos) -->
+<link rel="apple-touch-icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230a0a0c'/%3E%3Ctext x='90' y='128' font-family='Arial Black,Arial,sans-serif' font-size='120' font-weight='900' fill='%23ff8a3d' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 180 180'%3E%3Crect width='180' height='180' rx='40' fill='%230a0a0c'/%3E%3Ctext x='90' y='128' font-family='Arial Black,Arial,sans-serif' font-size='120' font-weight='900' fill='%23ff8a3d' text-anchor='middle'%3EM%3C/text%3E%3C/svg%3E">
+<link rel="manifest" href="data:application/manifest+json,%7B%22name%22%3A%22Merluzos%20Setlist%22%2C%22short_name%22%3A%22Merluzos%22%2C%22display%22%3A%22standalone%22%2C%22background_color%22%3A%22%230a0a0c%22%2C%22theme_color%22%3A%22%230a0a0c%22%2C%22icons%22%3A%5B%7B%22src%22%3A%22data%3Aimage%2Fsvg%2Bxml%2C%253Csvg%2520xmlns%3D%2527http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%2527%2520viewBox%3D%25270%25200%2520180%2520180%2527%253E%253Crect%2520width%3D%2527180%2527%2520height%3D%2527180%2527%2520rx%3D%252740%2527%2520fill%3D%2527%25230a0a0c%2527%2F%253E%253Ctext%2520x%3D%252790%2527%2520y%3D%2527128%2527%2520font-family%3D%2527Arial%2520Black%2Csans-serif%2527%2520font-size%3D%2527120%2527%2520font-weight%3D%2527900%2527%2520fill%3D%2527%2523ff8a3d%2527%2520text-anchor%3D%2527middle%2527%253EM%253C%2Ftext%253E%253C%2Fsvg%253E%22%2C%22sizes%22%3A%22any%22%2C%22type%22%3A%22image%2Fsvg%2Bxml%22%7D%5D%7D">
+<title>Setlist · Metrónomo</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Archivo+Expanded:wght@600;800&family=Space+Mono:wght@400;700&display=swap');
+
+  :root{
+    --bg:#0a0a0c;
+    --panel:#141418;
+    --line:#26262e;
+    --ink:#f2f0ea;
+    --dim:#7a7a86;
+    --amber:#ff8a3d;
+    --beat:#ffd84d;
+    --accent:#3ddc97;
+  }
+  *{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+  html,body{height:100%;}
+  body{
+    background:var(--bg);
+    color:var(--ink);
+    font-family:'Space Mono',monospace;
+    display:flex;flex-direction:column;
+    max-width:480px;margin:0 auto;
+    min-height:100dvh;
+    overscroll-behavior:none;
+  }
+
+  header{
+    padding:18px 20px 14px;
+    border-bottom:1px solid var(--line);
+    display:flex;align-items:baseline;justify-content:space-between;
+  }
+  header h1{
+    font-family:'Archivo Expanded',sans-serif;
+    font-weight:800;font-size:19px;letter-spacing:-0.5px;
+    text-transform:uppercase;
+  }
+  header h1 span{color:var(--amber);}
+  header h1 em{
+    font-style:normal;color:var(--ink);font-weight:800;
+    margin-left:10px;
+  }
+  header .count{font-size:12px;color:var(--dim);}
+
+  /* ---- Metrónomo activo ---- */
+  .stage{
+    padding:24px 20px 20px;
+    border-bottom:1px solid var(--line);
+    background:
+      radial-gradient(120% 80% at 50% -20%, rgba(255,138,61,0.10), transparent 60%),
+      var(--panel);
+  }
+  .now-label{font-size:11px;color:var(--dim);letter-spacing:2px;text-transform:uppercase;}
+  .now-title{
+    font-family:'Archivo Expanded',sans-serif;font-weight:600;
+    font-size:22px;margin-top:4px;line-height:1.1;
+    min-height:26px;
+  }
+  .now-title.empty{color:var(--dim);font-weight:600;}
+
+  .dial{
+    display:flex;align-items:center;justify-content:center;
+    gap:18px;margin:22px 0 6px;
+  }
+  .bpm-big{
+    font-family:'Archivo Expanded',sans-serif;font-weight:800;
+    font-size:84px;line-height:0.9;letter-spacing:-3px;
+    font-variant-numeric:tabular-nums;
+  }
+  .bpm-unit{font-size:13px;color:var(--dim);letter-spacing:2px;}
+
+  .pulse{
+    width:60px;height:60px;border-radius:50%;
+    border:2px solid var(--line);
+    display:flex;align-items:center;justify-content:center;
+    flex-shrink:0;transition:transform .05s,background .05s,border-color .05s;
+  }
+  .pulse.hit{background:var(--beat);border-color:var(--beat);transform:scale(1.12);}
+  .pulse.hit.one{background:var(--amber);border-color:var(--amber);}
+  .pulse-dots{display:flex;gap:5px;justify-content:center;margin-top:14px;}
+  .pulse-dots i{
+    width:8px;height:8px;border-radius:50%;background:var(--line);
+    transition:background .05s;
+  }
+  .pulse-dots i.on{background:var(--beat);}
+  .pulse-dots i.on.first{background:var(--amber);}
+
+  .transport{display:flex;gap:10px;margin-top:18px;}
+  .btn{
+    flex:1;border:none;border-radius:12px;padding:16px;
+    font-family:'Space Mono',monospace;font-weight:700;font-size:15px;
+    letter-spacing:1px;text-transform:uppercase;cursor:pointer;
+    background:var(--line);color:var(--ink);transition:filter .1s;
+  }
+  .btn:active{filter:brightness(1.3);}
+  .btn.play{background:var(--accent);color:#04140d;}
+  .btn.stop{background:var(--amber);color:#1a0a00;}
+  .btn:disabled{opacity:.35;cursor:default;}
+
+  .tweak{display:flex;align-items:center;gap:10px;margin-top:12px;}
+  .tweak button{
+    width:46px;height:46px;border-radius:10px;border:1px solid var(--line);
+    background:transparent;color:var(--ink);font-size:22px;font-weight:700;cursor:pointer;
+  }
+  .tweak button:active{background:var(--line);}
+  .tweak .sig{
+    flex:1;text-align:center;font-size:12px;color:var(--dim);letter-spacing:1px;
+  }
+  .tweak .sig b{color:var(--ink);font-size:14px;}
+
+  /* ---- Lista ---- */
+  .list{flex:1;overflow-y:auto;padding:6px 14px 14px;}
+  .song{
+    display:flex;align-items:center;gap:12px;
+    padding:14px 12px;border-bottom:1px solid var(--line);
+    cursor:pointer;border-radius:10px;
+  }
+  .song:active{background:var(--panel);}
+  .song.active{background:rgba(61,220,151,0.08);border-bottom-color:transparent;}
+  .song .idx{font-size:12px;color:var(--dim);width:22px;flex-shrink:0;}
+  .song .meta{flex:1;min-width:0;}
+  .song .name{font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .song.active .name{color:var(--accent);}
+  .song .bpm{font-family:'Archivo Expanded',sans-serif;font-weight:800;font-size:18px;font-variant-numeric:tabular-nums;}
+  .song .bpm small{font-size:9px;color:var(--dim);font-family:'Space Mono';font-weight:400;display:block;text-align:right;letter-spacing:1px;}
+  .song .del{
+    background:none;border:none;color:var(--dim);font-size:20px;
+    padding:4px 8px;cursor:pointer;flex-shrink:0;
+  }
+  .song .del:active{color:var(--amber);}
+
+  .empty-list{text-align:center;color:var(--dim);padding:40px 20px;font-size:13px;line-height:1.6;}
+
+  /* ---- Agregar ---- */
+  .add{
+    border-top:1px solid var(--line);padding:14px;
+    display:flex;gap:8px;background:var(--panel);
+  }
+  .add input{
+    background:var(--bg);border:1px solid var(--line);border-radius:10px;
+    color:var(--ink);font-family:'Space Mono';font-size:15px;padding:13px 12px;
+  }
+  .add input.name{flex:1;min-width:0;}
+  .add input.bpm{width:74px;text-align:center;font-weight:700;}
+  .add input::placeholder{color:var(--dim);}
+  .add button{
+    background:var(--amber);color:#1a0a00;border:none;border-radius:10px;
+    width:50px;font-size:26px;font-weight:700;cursor:pointer;flex-shrink:0;
+  }
+  .add button:active{filter:brightness(1.2);}
+</style>
+</head>
+<body>
+  <header>
+    <h1>SET<span>·</span>LIST <em>Merluzos</em></h1>
+    <span class="count" id="count">0 temas</span>
+  </header>
+
+  <section class="stage">
+    <div class="now-label">Sonando ahora</div>
+    <div class="now-title empty" id="nowTitle">Elige un tema de la lista</div>
+
+    <div class="dial">
+      <div>
+        <div class="bpm-big" id="bpmBig">—</div>
+      </div>
+      <div class="pulse" id="pulse"></div>
+    </div>
+    <div style="text-align:center"><span class="bpm-unit">BPM</span></div>
+    <div class="pulse-dots" id="dots"></div>
+
+    <div class="transport">
+      <button class="btn play" id="playBtn" disabled>▶ Iniciar</button>
+      <button class="btn stop" id="stopBtn" disabled>■ Parar</button>
+    </div>
+
+    <div class="tweak">
+      <button id="minus">–</button>
+      <div class="sig">
+        compás <b id="sigLabel">4/4</b> · toca para cambiar
+      </div>
+      <button id="plus">+</button>
+    </div>
+  </section>
+
+  <div class="list" id="list"></div>
+
+  <div class="add">
+    <input class="name" id="inName" placeholder="Nombre de la canción" autocomplete="off">
+    <input class="bpm" id="inBpm" placeholder="BPM" inputmode="numeric" maxlength="3">
+    <button id="addBtn">+</button>
+  </div>
+
+<script>
+/* ---------- Estado ---------- */
+let songs = [];
+let activeId = null;
+let beatsPerBar = 4;
+const SIGS = [3,4,5,6];
+
+/* ---------- Almacenamiento permanente en el teléfono ---------- */
+const STORE_KEY='setlist_metronomo_v1';
+function load(){
+  try{
+    const raw=localStorage.getItem(STORE_KEY);
+    if(raw){
+      const d=JSON.parse(raw);
+      if(Array.isArray(d.songs)) songs=d.songs;
+      if(d.beatsPerBar) beatsPerBar=d.beatsPerBar;
+    }
+  }catch(e){ songs=[]; }
+}
+function save(){
+  try{ localStorage.setItem(STORE_KEY, JSON.stringify({songs,beatsPerBar})); }catch(e){}
+}
+
+/* ---------- Audio / Metrónomo ---------- */
+let ac=null, playing=false, nextTime=0, beat=0, timer=null, curBpm=0;
+const LOOKAHEAD=25, SCHED=0.1;
+
+function ensureCtx(){ if(!ac) ac=new (window.AudioContext||window.webkitAudioContext)(); if(ac.state==='suspended') ac.resume(); }
+
+function click(time, accent){
+  const o=ac.createOscillator(), g=ac.createGain();
+  o.frequency.value = accent?1500:900;
+  g.gain.setValueAtTime(0.0001,time);
+  g.gain.exponentialRampToValueAtTime(accent?0.9:0.5,time+0.001);
+  g.gain.exponentialRampToValueAtTime(0.0001,time+0.05);
+  o.connect(g).connect(ac.destination);
+  o.start(time); o.stop(time+0.06);
+  // visual
+  const visualDelay=(time-ac.currentTime)*1000;
+  setTimeout(()=>flash(accent),Math.max(0,visualDelay));
+}
+
+function flash(accent){
+  const p=document.getElementById('pulse');
+  p.classList.add('hit'); if(accent)p.classList.add('one');
+  setTimeout(()=>p.classList.remove('hit','one'),90);
+  const dots=document.querySelectorAll('#dots i');
+  dots.forEach((d,i)=>d.classList.toggle('on', i===(beat===0?beatsPerBar-1:beat-1)));
+  dots.forEach(d=>d.classList.toggle('first', d.classList.contains('on') && (beat===1||beat===0)));
+}
+
+function scheduler(){
+  while(nextTime < ac.currentTime + SCHED){
+    click(nextTime, beat===0);
+    nextTime += 60.0/curBpm;
+    beat=(beat+1)%beatsPerBar;
+  }
+  timer=setTimeout(scheduler,LOOKAHEAD);
+}
+
+function start(){
+  if(!activeId) return;
+  ensureCtx();
+  curBpm = songs.find(s=>s.id===activeId).bpm;
+  playing=true; beat=0; nextTime=ac.currentTime+0.05;
+  scheduler();
+  document.getElementById('playBtn').disabled=true;
+  document.getElementById('stopBtn').disabled=false;
+}
+function stop(){
+  playing=false; clearTimeout(timer);
+  document.getElementById('playBtn').disabled=!activeId;
+  document.getElementById('stopBtn').disabled=true;
+  document.querySelectorAll('#dots i').forEach(d=>d.classList.remove('on','first'));
+}
+
+/* ---------- UI ---------- */
+function buildDots(){
+  const c=document.getElementById('dots'); c.innerHTML='';
+  for(let i=0;i<beatsPerBar;i++) c.appendChild(document.createElement('i'));
+}
+
+function selectSong(id){
+  const wasPlaying=playing;
+  if(playing) stop();
+  activeId=id;
+  const s=songs.find(x=>x.id===id);
+  document.getElementById('nowTitle').textContent=s.name;
+  document.getElementById('nowTitle').classList.remove('empty');
+  document.getElementById('bpmBig').textContent=s.bpm;
+  document.getElementById('playBtn').disabled=false;
+  render();
+  if(wasPlaying) start();
+}
+
+function render(){
+  const list=document.getElementById('list');
+  document.getElementById('count').textContent=songs.length+(songs.length===1?' tema':' temas');
+  if(songs.length===0){
+    list.innerHTML='<div class="empty-list">Aún no hay canciones.<br>Agrega el nombre y su BPM abajo.<br><br>Toca un tema para cargar su tempo,<br>luego pulsa Iniciar.</div>';
+    return;
+  }
+  list.innerHTML='';
+  songs.forEach((s,i)=>{
+    const row=document.createElement('div');
+    row.className='song'+(s.id===activeId?' active':'');
+    row.innerHTML=`
+      <span class="idx">${String(i+1).padStart(2,'0')}</span>
+      <div class="meta"><div class="name">${escapeHtml(s.name)}</div></div>
+      <div class="bpm">${s.bpm}<small>BPM</small></div>
+      <button class="del" data-id="${s.id}">×</button>`;
+    row.addEventListener('click',e=>{ if(e.target.classList.contains('del'))return; selectSong(s.id); });
+    row.querySelector('.del').addEventListener('click',()=>{
+      if(s.id===activeId){ stop(); activeId=null;
+        document.getElementById('nowTitle').textContent='Elige un tema de la lista';
+        document.getElementById('nowTitle').classList.add('empty');
+        document.getElementById('bpmBig').textContent='—';
+        document.getElementById('playBtn').disabled=true;
+      }
+      songs=songs.filter(x=>x.id!==s.id); render(); save();
+    });
+    list.appendChild(row);
+  });
+}
+
+function escapeHtml(t){return t.replace(/[&<>"]/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));}
+
+function addSong(){
+  const n=document.getElementById('inName').value.trim();
+  let b=parseInt(document.getElementById('inBpm').value,10);
+  if(!n){document.getElementById('inName').focus();return;}
+  if(!b||b<30||b>300){document.getElementById('inBpm').focus();return;}
+  songs.push({id:Date.now()+Math.random(),name:n,bpm:b});
+  document.getElementById('inName').value='';
+  document.getElementById('inBpm').value='';
+  document.getElementById('inName').focus();
+  render(); save();
+}
+
+/* ---------- Eventos ---------- */
+document.getElementById('addBtn').addEventListener('click',addSong);
+document.getElementById('inBpm').addEventListener('keydown',e=>{if(e.key==='Enter')addSong();});
+document.getElementById('inName').addEventListener('keydown',e=>{if(e.key==='Enter')document.getElementById('inBpm').focus();});
+document.getElementById('playBtn').addEventListener('click',start);
+document.getElementById('stopBtn').addEventListener('click',stop);
+
+document.getElementById('plus').addEventListener('click',()=>changeSig(1));
+document.getElementById('minus').addEventListener('click',()=>changeSig(-1));
+function changeSig(d){
+  let i=SIGS.indexOf(beatsPerBar); i=(i+d+SIGS.length)%SIGS.length;
+  beatsPerBar=SIGS[i];
+  document.getElementById('sigLabel').textContent=beatsPerBar+'/4';
+  buildDots(); save();
+  if(playing){stop();start();}
+}
+
+load();
+document.getElementById('sigLabel').textContent=beatsPerBar+'/4';
+buildDots(); render();
+</script>
+</body>
+</html>

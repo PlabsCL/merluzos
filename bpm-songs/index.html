@@ -117,14 +117,8 @@
   .nudge:active{background:var(--line);}
   .nudge:disabled{opacity:.3;cursor:default;}
   .song .name sup{color:var(--amber);font-size:13px;margin-left:2px;}
-  .song .bpm.changed{color:var(--beat);}
   .foot{font-size:11px;color:var(--dim);text-align:center;padding:14px 0 4px;line-height:1.6;}
   .foot sup{color:var(--amber);}
-  .foot button{
-    margin-top:8px;background:none;border:1px solid var(--line);border-radius:8px;
-    color:var(--dim);font-family:'Space Mono';font-size:11px;padding:8px 12px;cursor:pointer;
-  }
-  .foot button.confirm{background:var(--amber);color:#1a0a00;border-color:var(--amber);}
   .tweak{display:flex;align-items:center;gap:10px;margin-top:12px;}
   .tweak button{
     width:46px;height:46px;border-radius:10px;border:1px solid var(--line);
@@ -247,7 +241,7 @@ const DEFAULT_SONGS = [
   {name:'La Guitarra', bpm:147},
 ];
 function defaultSongs(){
-  return DEFAULT_SONGS.map((s,i)=>({id:'d'+i, name:s.name, bpm:s.bpm, base:s.bpm, mark:!!s.mark}));
+  return DEFAULT_SONGS.map((s,i)=>({id:'d'+i, name:s.name, bpm:s.bpm, mark:!!s.mark}));
 }
 
 /* ---------- Almacenamiento permanente en el teléfono ---------- */
@@ -354,7 +348,7 @@ function render(){
     row.innerHTML=`
       <span class="idx">${String(i+1).padStart(2,'0')}</span>
       <div class="meta"><div class="name">${escapeHtml(s.name)}${s.mark?'<sup>*</sup>':''}</div></div>
-      <div class="bpm${s.base&&s.bpm!==s.base?' changed':''}">${s.bpm}<small>${s.base&&s.bpm!==s.base?'ANTES '+s.base:'BPM'}</small></div>
+      <div class="bpm">${s.bpm}<small>BPM</small></div>
       <button class="del" data-id="${s.id}">×</button>`;
     row.addEventListener('click',e=>{ if(e.target.classList.contains('del'))return; selectSong(s.id); });
     row.querySelector('.del').addEventListener('click',()=>{
@@ -372,19 +366,8 @@ function render(){
   const foot=document.createElement('div');
   foot.className='foot';
   foot.innerHTML=(songs.some(s=>s.mark)?'<sup>*</sup> marcado en la setlist original<br>':'')
-    +'Tus cambios se guardan solo en este teléfono.<br><button id="resetBtn">Volver a la lista original</button>';
+    +'Tus cambios se guardan solo en este teléfono.';
   list.appendChild(foot);
-  const rb=foot.querySelector('#resetBtn');
-  rb.addEventListener('click',()=>{
-    if(!rb.classList.contains('confirm')){ rb.classList.add('confirm'); rb.textContent='Toca de nuevo para confirmar'; return; }
-    stop(); activeId=null; songs=defaultSongs(); save();
-    document.getElementById('nowTitle').textContent='Elige un tema de la lista';
-    document.getElementById('nowTitle').classList.add('empty');
-    document.getElementById('bpmBig').textContent='—';
-    document.getElementById('playBtn').disabled=true;
-    document.getElementById('bpmUp').disabled=document.getElementById('bpmDown').disabled=true;
-    render();
-  });
 }
 
 function nudge(d){
